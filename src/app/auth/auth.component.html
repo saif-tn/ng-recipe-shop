@@ -1,0 +1,62 @@
+<ng-template appPlaceholder></ng-template>
+
+<div class="row">
+    <div *ngIf="isLoading" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+</div>
+<app-alert [errorMessage]="error" *ngIf="error" (click)="onCloseAlertAuth()"></app-alert>
+<form 
+    class="form-signin" 
+    #authForm="ngForm"
+    (ngSubmit)="onAuthSubmit(authForm)"
+    *ngIf="!isLoading">
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <br>
+    <!-- <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-danger" *ngIf="error">
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        <br>
+    </div> -->
+    <div class="form-group">
+        <label for="email" class="">Email address</label>
+        <input 
+            type="email"
+            ngModel
+            email
+            name="email" 
+            class="form-control" 
+            placeholder="Email address" 
+            required 
+            autofocus="">    
+    </div>
+    <div class="form-group">
+        <label for="password" class="">Password</label>
+        <input 
+            type="password"
+            ngModel
+            minlength="6"
+            name="password" 
+            class="form-control" 
+            placeholder="Password" 
+            required>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <button class="btn btn-lg btn-primary btn-block" type="submit"   [disabled]="!authForm.valid">
+                {{ isLoginMode ? 'Login' : 'Sign up' }}
+            </button>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-lg btn-success btn-block" 
+                    (click)="onSwitchMode()"
+                    type="button">
+            Switch to {{ isLoginMode ? 'Sign up' : 'Login' }}
+            </button>
+        </div>
+    </div>
+  </form>
