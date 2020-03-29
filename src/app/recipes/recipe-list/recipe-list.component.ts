@@ -14,6 +14,10 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   recipes: Recipe[];
   subscription: Subscription;
 
+  // @Input() title: any;
+  // @Output() titleChange: EventEmitter<any> = new EventEmitter<any>();
+  typeRecipe: string;
+
   constructor(private recipeService: RecipeService,
               private router: Router,
               private route: ActivatedRoute) {
