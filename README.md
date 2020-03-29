@@ -19,7 +19,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 + Splitted modules
 + Interceptors implemented
 + Forms and Reactive Forms implemented
-
++ NEW! NgRx implemented
 
 ## Development server
 
