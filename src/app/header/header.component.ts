@@ -2,6 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DataStorageService } from '../shared/data-storage.service';
 import { AuthService } from '../auth/auth.service';
+import { map } from 'rxjs/operators';
+// using NgRx
+import { Store } from '@ngrx/store';
+import * as fromAuth from '../store/app.reducer';
+import * as AuthActions from '../auth/store/auth.actions';
 
 @Component({
   selector: 'app-header',
@@ -13,11 +18,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
 
   constructor(private dataStorageService: DataStorageService,
-              private authService: AuthService) {}
+              private authService: AuthService,
+              private store: Store<fromAuth.AppState>) {}
 
   ngOnInit() {
     // to get the statuts of user Subject which we will track
-    this.userSub = this.authService.user.subscribe( user => {
+    this.userSub = this.store.
+    select('auth')
+    .pipe(
+      map(authState => authState.user)
+    )
+    .subscribe( user => {
       // if we have a user the isAuthenticated = true
       this.isAuthenticated = !user ? false : true;
     });
@@ -35,6 +46,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onLogOut() {
-    this.authService.logoutUser();
+    // this.authService.logoutUser();
+    this.store.dispatch(
+      new AuthActions.Logout()
+    );
   }
 }

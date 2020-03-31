@@ -1,10 +1,12 @@
 import { Ingredient } from '../../shared/ingredient.model';
 import * as ShoppingListActions from './shopping-list.actions';
 
+/*
+* REMOVED TO PLACED IN ROOT WITH GLOBAL LOGIC
 export interface AppState {
     shoppingList: State;
 }
-
+ */
 // using interface to use it in all components
 export interface State {
     ingredients: Ingredient[];

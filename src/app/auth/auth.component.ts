@@ -1,17 +1,22 @@
-import { Component, ComponentFactoryResolver, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ComponentFactoryResolver, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AuthService, AuthResponseData } from './auth.service';
-import { Observable, Subscription } from 'rxjs';
+import { AuthService } from './auth.service';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
+import { Store } from '@ngrx/store';
+
+// using NgRx store effects
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 @Component({
     selector: 'app-auth',
     templateUrl: './auth.component.html',
     styleUrls: ['./auth.component.css']
 })
-export class AuthComponent implements OnDestroy {
+export class AuthComponent implements OnInit, OnDestroy {
     isLoginMode = true;
     isLoading = false;
     error: string = null;
@@ -19,11 +24,24 @@ export class AuthComponent implements OnDestroy {
       // to use it in the Success Alert
     @ViewChild(PlaceholderDirective, {static: true, read: PlaceholderDirective}) alertHost: PlaceholderDirective;
     private closeAlertSucces: Subscription;
+    private storeSub: Subscription;
 
     constructor(private authService: AuthService,
                 private router: Router,
-                private componentFactoryResolver: ComponentFactoryResolver) {}
+                private componentFactoryResolver: ComponentFactoryResolver,
+                private store: Store<fromApp.AppState>) {}
 
+    ngOnInit() {
+        // using NgRx
+        this.storeSub = this.store.select('auth').subscribe(authState => {
+            this.isLoading = authState.loading;
+            this.error = authState.authError;
+            if (this.error) {
+                // using showSuccessAlert to show an error
+                this.showSuccessAlert(this.error);
+            }
+        });
+    }
     onSwitchMode() {
         // change the button which sign in / sign up
         this.isLoginMode = !this.isLoginMode;
@@ -35,39 +53,25 @@ export class AuthComponent implements OnDestroy {
         this.isLoading = true;
 
         // using commun observable for both login / sign up
-        let authObsv: Observable<AuthResponseData>;
+        // let authObsv: Observable<AuthResponseData>;
 
         if (!form.valid) {
             return;
         }
         if (this.isLoginMode) {
             // sign in
-            authObsv = this.authService.signinnUser(email, password);
+            // authObsv = this.authService.signinnUser(email, password);
+            // using NgRx
+            this.store.dispatch(
+                new AuthActions.LoginStart({ email: email, password: password })
+              );
         } else {
             // sign up
-            authObsv =  this.authService.signupUser(email, password);
+            // authObsv =  this.authService.signupUser(email, password);
+            this.store.dispatch(
+                new AuthActions.SignupStart({ email: email, password: password })
+            );
         }
-
-        authObsv.subscribe (
-            responseData => {
-                console.log(responseData);
-                this.isLoading = false;
-                // show error alert programmatcly
-                console.log('authObsv fired! - login success alert');
-                this.showSuccessAlert('Hello');
-                // redirect user after login
-                setTimeout(() => {
-                    this.router.navigate(['recipes']);
-                }, 2000);
-            },
-            errorMessage => {
-                // all error logic is in the AuthService
-                this.isLoading = false;
-                this.error = errorMessage;
-                console.log('Error from server - onAuthSubmit');
-                console.log(errorMessage);
-            }
-        );
 
         // console.log(form.value);
         form.reset();
@@ -75,7 +79,8 @@ export class AuthComponent implements OnDestroy {
 
     onCloseAlertAuth() {
         // set error to false to hide it in the if
-        this.error = null;
+        // this.error = null;
+        this.store.dispatch(new AuthActions.ClearError());
     }
 
     private showSuccessAlert(message: string) {
@@ -93,8 +98,11 @@ export class AuthComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.closeAlertSucces){
+        if (this.closeAlertSucces) {
             this.closeAlertSucces.unsubscribe();
+        }
+        if (this.storeSub) {
+            this.storeSub.unsubscribe();
         }
     }
 

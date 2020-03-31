@@ -6,6 +6,11 @@ import { StoreModule } from '@ngrx/store';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { AppRoutingModule } from './app-routing.module';
+// using NgRx effects
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/store/auth.effects';
+// adding devtools NgRx
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 // splitting app into certain modules
 // RecipesModule
@@ -16,7 +21,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 // CoreModule
 import { CoreModule } from './core.module';
-import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer';
+// import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer';
+// import { authReducer } from './auth/store/auth.reducer';
+// REPLACED WITHJ GLOBAL APP REDUCER
+import * as fromApp from '../app/store/app.reducer';
+import { environment } from '../environments/environment';
 // AuthModule
 // import { AuthModule } from './auth/auth.module';
 
@@ -32,8 +41,10 @@ import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    // ngRX
-    StoreModule.forRoot({shoppingList: shoppingListReducer}),
+    // NgRX
+    StoreModule.forRoot(fromApp.appReducer),
+    // NgRx effects
+    EffectsModule.forRoot([AuthEffects]),
     // splitting 2 main modules
     // removed because of the lazy loading implementation
     // RecipesModule,
@@ -41,7 +52,9 @@ import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer
     // AuthModule,
     SharedModule,
     // providers // services
-    CoreModule
+    CoreModule,
+    // devtools NgRX
+    StoreDevtoolsModule.instrument({logOnly: environment.production})
   ],
   bootstrap: [AppComponent]
 })
