@@ -3,21 +3,12 @@
     <button class="btn btn-success" (click)="onNewRecipe()">New Recipe</button>
   </div>
 </div>
-<hr>
-<div class="row">
-  <div class="col-xs-12">
-      <select class="form-control" [(ngModel)]="typeRecipe" name="typeRecipe" id="typeRecipe">
-          <option selected value="">All types of recipes</option>
-          <option value="sweet">Sweet</option>
-          <option value="spicy">Spicy</option>
-      </select>
-  </div>
-</div>
+
 <hr>
 <div class="row">
   <div class="col-xs-12">
     <app-recipe-item
-      *ngFor="let recipeEl of recipes | filterRecipe:typeRecipe:'type' ; let x = index"
+      *ngFor="let recipeEl of recipes; let x = index"
       [recipe]="recipeEl"
       [index]="x"></app-recipe-item>
   </div>

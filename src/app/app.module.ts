@@ -9,8 +9,14 @@ import { AppRoutingModule } from './app-routing.module';
 // using NgRx effects
 import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './auth/store/auth.effects';
+import { RecipeEffects } from './recipes/store/recipe.effects';
+
 // adding devtools NgRx
+// to monitor states in chrome
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+// we rae adding the Router store
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+
 
 // splitting app into certain modules
 // RecipesModule
@@ -44,7 +50,7 @@ import { environment } from '../environments/environment';
     // NgRX
     StoreModule.forRoot(fromApp.appReducer),
     // NgRx effects
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, RecipeEffects]),
     // splitting 2 main modules
     // removed because of the lazy loading implementation
     // RecipesModule,
@@ -54,7 +60,8 @@ import { environment } from '../environments/environment';
     // providers // services
     CoreModule,
     // devtools NgRX
-    StoreDevtoolsModule.instrument({logOnly: environment.production})
+    StoreDevtoolsModule.instrument({logOnly: environment.production}),
+    StoreRouterConnectingModule.forRoot()
   ],
   bootstrap: [AppComponent]
 })
