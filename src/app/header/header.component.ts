@@ -23,23 +23,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private store: Store<fromAuth.AppState>) {}
 
   ngOnInit() {
-    // to get the statuts of user Subject which we will track
-    this.userSub = this.store.
-    select('auth')
-    .pipe(
-      map(authState => authState.user)
-    )
-    .subscribe( user => {
-      // if we have a user the isAuthenticated = true
-      this.isAuthenticated = !user ? false : true;
-    });
+    this.userSub = this.store
+      .select('auth')
+      .pipe(map(authState => authState.user))
+      .subscribe(user => {
+        this.isAuthenticated = !!user;
+        console.log(!user);
+        console.log(!!user);
+      });
   }
+
   ngOnDestroy() {
     this.userSub.unsubscribe();
   }
 
   onSaveData() {
-    this.dataStorageService.storeRecipes();
+    //this.dataStorageService.storeRecipes();
+    this.store.dispatch(new RecipesActions.StoreRecipes());
   }
 
   onFetchData() {
